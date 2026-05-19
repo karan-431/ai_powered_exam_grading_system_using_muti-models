@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+sqlalchemy
+pymysql
+cryptography
+httpx
+Pillow
+pdf2image
+aiofiles

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Exam Assessment System</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/style.css">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="background-animation"></div>
+
+    <div class="container">
+        <header>
+            <h1><i class="fa-solid fa-graduation-cap"></i> AI-Grade <span>Pro</span></h1>
+            <p>Automated Exam Assessment & Evaluation</p>
+        </header>
+
+        <main>
+            <div class="glass-card form-container">
+                <form id="evaluationForm" enctype="multipart/form-data">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="roll_number"><i class="fa-solid fa-id-card"></i> Roll Number</label>
+                            <input type="text" id="roll_number" name="roll_number" required
+                                placeholder="e.g. 21BCE2000">
+                        </div>
+                        <div class="form-group">
+                            <label for="max_marks"><i class="fa-solid fa-star"></i> Max Marks</label>
+                            <select id="max_marks" name="max_marks" required>
+                                <option value="10">10</option>
+                                <option value="20">20</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group file-upload">
+                        <label><i class="fa-solid fa-file-signature"></i> Student Answer Sheet (PDF/Image)</label>
+                        <div class="drop-zone" id="answerSheetDrop">
+                            <span class="drop-zone__prompt">Drop file here or click to upload</span>
+                            <input type="file" name="answer_sheet" id="answer_sheet" class="drop-zone__input"
+                                accept=".pdf,image/*" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label><i class="fa-solid fa-key"></i> Answer Key</label>
+                        <div class="toggle-container">
+                            <button type="button" class="toggle-btn active" data-target="key-text"><i
+                                    class="fa-solid fa-keyboard"></i> Text</button>
+                            <button type="button" class="toggle-btn" data-target="key-file"><i
+                                    class="fa-solid fa-file-upload"></i> File</button>
+                        </div>
+
+                        <div id="key-text" class="key-input-mode active">
+                            <textarea name="answer_key_text" id="answer_key_text" rows="5"
+                                placeholder="Paste the marking scheme or correct answers here..."></textarea>
+                        </div>
+
+                        <div id="key-file" class="key-input-mode">
+                            <div class="drop-zone">
+                                <span class="drop-zone__prompt">Drop Answer Key here</span>
+                                <input type="file" name="answer_key_file" id="answer_key_file" class="drop-zone__input"
+                                    accept=".txt,.md,.pdf,image/*">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span>Evaluate Student</span>
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="glass-card hidden">
+                <div class="loader"></div>
+                <h3>AI is evaluating the exam...</h3>
+                <p>Running multi-stage pipeline (Vision → Context → Evaluation)</p>
+                <div class="steps">
+                    <div class="step active" id="step1">Extracting handwritten text</div>
+                    <div class="step" id="step2">Building marking scheme</div>
+                    <div class="step" id="step3">Evaluating answers</div>
+                    <div class="step" id="step4">Validating confidence</div>
+                </div>
+            </div>
+
+            <!-- Result State -->
+            <div id="resultState" class="glass-card hidden result-container">
+                <h2>Evaluation Complete</h2>
+                <div class="score-display">
+                    <div class="score-circle">
+                        <div class="score-content">
+                            <span id="finalScore" class="score-value">0</span>
+                            <span class="score-divider">/</span>
+                            <span id="maxScore" class="score-max">100</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-details">
+                    <div class="detail-item">
+                        <i class="fa-solid fa-user"></i>
+                        <div class="detail-text">
+                            <span class="label">Roll Number</span>
+                            <strong id="resRollNumber">---</strong>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <div class="detail-text">
+                            <span class="label">AI Confidence</span>
+                            <span id="resConfidence" class="badge">---</span>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <div class="detail-text">
+                            <span class="label">Raw Extracted Marks</span>
+                            <strong id="resRawMarks">---</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" class="action-btn" id="resetBtn">Evaluate Another</button>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="glass-card hidden error-container">
+                <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+                <h3>Evaluation Failed</h3>
+                <p id="errorMessage">Something went wrong.</p>
+                <button type="button" class="action-btn" id="errorResetBtn">Try Again</button>
+            </div>
+
+        </main>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+
+</html>
